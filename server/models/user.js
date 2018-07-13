@@ -54,6 +54,17 @@ UserSchema.methods.generateAuthToken = function() {
     });
 };
 
+//adding instance method
+UserSchema.methods.removeToken = function(token) {
+    var user = this;
+
+    return user.update({
+        $pull: {
+            tokens: {token}
+        }
+    });
+};
+
 //adding static method
 UserSchema.statics.findByToken = function (token) {
     var User = this;
@@ -72,6 +83,7 @@ UserSchema.statics.findByToken = function (token) {
     });
 };
 
+//adding static method
 UserSchema.statics.findByCredentials = function (email, password) {
     var User = this;
 
