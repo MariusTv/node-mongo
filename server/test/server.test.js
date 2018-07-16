@@ -251,34 +251,44 @@ describe('GET /users/me', () => {
 });
 
 describe('POST /users', () => {
-    // it('should create a user', (done) => {
-    //     var email = 'test2@example.com';
-    //     var password = 'abc11';
-    //
-    //     request(app)
-    //         .post('/users')
-    //         .send({email, password})
-    //         .expect(200)
-    //         .expect((res) => {
-    //             expect(res.headers['x-auth']).toExist();
-    //             expect(res.body._id).toExist();
-    //             expect(res.body.email).toBe(email);
-    //         })
-    //         .end(done);
-    //
-    // });
+    it('should create a user', (done) => {
+        var email = 'example@example.com';
+        var password = '12222222!';
 
-    // it('should return validation error if request is invalid', (done) => {
-    //     request(app)
-    //     .post('/users')
-    //     .send({})
-    //     .expect(400)
-    //     .end(done);
-    // });
-    //
+        request(app)
+            .post('/users')
+            .send({email, password})
+            .expect(200)
+            .expect((res) => {
+                expect(res.headers['x-auth']).toBeTruthy();
+                expect(res.body._id).toBeTruthy();
+                expect(res.body.email).toBe(email);
+            })
+            .end((err) => {
+                if (err) {
+                    return done(err);
+                }
+
+                User.findOne({email}).then((user) => {
+                    expect(user).toBeTruthy();
+                    expect(user.password).not.toBe(password);
+                    done();
+                }).catch((e) => done(e));
+            });
+
+    });
+
+    it('should return validation error if request is invalid', (done) => {
+        request(app)
+        .post('/users')
+        .send({})
+        .expect(400)
+        .end(done);
+    });
+
 
     it('should not create a user if email in use', (done) => {
-        let email = 'marius@test.com';
+        let email = users[0].email;
         let password = 'aa123';
 
         request(app)
