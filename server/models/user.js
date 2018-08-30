@@ -42,16 +42,15 @@ UserSchema.methods.toJSON = function() {
 }
 
 //adding out custom method. we do not use arrow function because arrow function do not bind a 'this' keyword
-UserSchema.methods.generateAuthToken = function() {
+UserSchema.methods.generateAuthToken = async function() {
     var user = this;
     var access = 'auth';
     var token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
 
     user.tokens = user.tokens.concat([{access, token}]);
 
-    return user.save().then(() => {
-        return token;
-    });
+    await user.save();
+    return token;
 };
 
 //adding instance method
@@ -84,7 +83,7 @@ UserSchema.statics.findByToken = function (token) {
 };
 
 //adding static method
-UserSchema.statics.findByCredentials = function (email, password) {
+UserSchema.statics.findByCredentials = async function (email, password) {
     var User = this;
 
     return User.findOne({email}).then((user) => {
